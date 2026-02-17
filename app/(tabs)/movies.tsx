@@ -6,7 +6,7 @@ import SerieCard from "@/components/SerieCard";
 import { Colors } from "@/constants/Colors";
 import usePaginatedFetch from "@/hooks/usePaginatedFetch";
 import { fetchPopularActors } from "@/services/actorService";
-import { fetchLatestMovies, fetchTrendings } from "@/services/movieService";
+import { fetchLatestMovies, fetchPopularMovies, fetchTopRatedMovies, fetchTrendings } from "@/services/movieService";
 import { fetchLatestSeries } from "@/services/serieService";
 import { Movie } from "@/types/movie";
 import { Person } from "@/types/person";
@@ -20,14 +20,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-export default function Index() {
-   const {
-      data: trendings,
-      loading: trendingsLoading,
-      error: trendingsError,
-      loadMore: loadMoreTrendings,
-   } = usePaginatedFetch(fetchTrendings);
-
+export default function MoviesScreen() {
    const {
       data: latestMovies,
       loading: latestMoviesLoading,
@@ -36,17 +29,18 @@ export default function Index() {
    } = usePaginatedFetch(fetchLatestMovies);
 
    const {
-      data: latestSeries,
-      loading: latestSeriesLoading,
-      error: latestSeriesError,
-      loadMore: loadMoreLatestSeries,
-   } = usePaginatedFetch(fetchLatestSeries);
+      data: topRatedMovies,
+      loading: topRatedMoviesLoading,
+      error: topRatedMoviesError,
+      loadMore: loadMoreTopRatedMovies,
+   } = usePaginatedFetch(fetchTopRatedMovies);
 
    const {
-      data: popularActors,
-      loading: popularActorsLoading,
-      loadMore: loadMorePopularActors,
-   } = usePaginatedFetch(fetchPopularActors);
+      data: popularMovies,
+      loading: popularMoviesLoading,
+      error: popularMoviesError,
+      loadMore: loadMorePopularMovies,
+   } = usePaginatedFetch(fetchPopularMovies);
 
    return (
       <SafeAreaView style={styles.container}>
@@ -55,21 +49,12 @@ export default function Index() {
             showsVerticalScrollIndicator={false}
             contentContainerStyle={{ minHeight: "100%", paddingBottom: 10 }}
          >
-            {latestMoviesLoading && trendingsLoading && latestSeriesLoading ? (
+            {latestMoviesLoading && topRatedMoviesLoading && popularMoviesLoading ? (
                <ActivityIndicator size="large" color={Colors.card} />
-            ) : trendingsError || latestMoviesError || latestSeriesError ? (
-               <Text>Error: {trendingsError?.message}</Text>
+            ) : latestMoviesError || topRatedMoviesError || popularMoviesError ? (
+               <Text>Error: {popularMoviesError?.message}</Text>
             ) : (
                <View>
-                  <HorizontalList<Movie>
-                     title="Trendings"
-                     data={trendings}
-                     loadMore={loadMoreTrendings}
-                     loading={trendingsLoading}
-                     keyExtractor={(item) => item.id.toString()}
-                     renderItem={({ item }) => <MovieCard {...item} />}
-                  />
-
                   <HorizontalList<Movie>
                      title="Latest Movies"
                      data={latestMovies}
@@ -79,22 +64,22 @@ export default function Index() {
                      renderItem={({ item }) => <MovieCard {...item} />}
                   />
 
-                  <HorizontalList<Serie>
-                     title="Latest Series"
-                     data={latestSeries}
-                     loadMore={loadMoreLatestSeries}
-                     loading={latestSeriesLoading}
+                  <HorizontalList<Movie>
+                     title="Top Rated Movies"
+                     data={topRatedMovies}
+                     loadMore={loadMoreTopRatedMovies}
+                     loading={topRatedMoviesLoading}
                      keyExtractor={(item) => item.id.toString()}
-                     renderItem={({ item }) => <SerieCard {...item} />}
+                     renderItem={({ item }) => <MovieCard {...item} />}
                   />
 
-                  <HorizontalList<Person>
-                     title="Popular Actors"
-                     data={popularActors}
-                     loadMore={loadMorePopularActors}
-                     loading={popularActorsLoading}
+                  <HorizontalList<Movie>
+                     title="Popular Movies"
+                     data={popularMovies}
+                     loadMore={loadMorePopularMovies}
+                     loading={popularMoviesLoading}
                      keyExtractor={(item) => item.id.toString()}
-                     renderItem={({ item }) => <ActorProfile {...item} />}
+                     renderItem={({ item }) => <MovieCard {...item} />}
                   />
                </View>
             )}
