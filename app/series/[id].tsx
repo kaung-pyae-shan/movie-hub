@@ -2,8 +2,11 @@ import CastGrid from "@/components/CastGrid";
 import SeasonList from "@/components/SeasonList";
 import { Colors } from "@/constants/Colors";
 import useFetch from "@/hooks/useFetch";
-import { fetchMoviesCasts, fetchMovieVideos } from "@/services/movieService";
-import { fetchSerieCasts, fetchSerieDetails, fetchSerieVideos } from "@/services/serieService";
+import {
+   fetchSerieCasts,
+   fetchSerieDetails,
+   fetchSerieVideos,
+} from "@/services/serieService";
 import { getPoster } from "@/util/image";
 import Entypo from "@expo/vector-icons/Entypo";
 import Ionicons from "@expo/vector-icons/Ionicons";
@@ -110,18 +113,20 @@ export default function SerieDetails() {
                            color="yellow"
                         />
                      </View> */}
-                     <TouchableOpacity
-                        style={styles.trailerBtn}
-                        onPress={() => {
-                           if (!trailerKey) return;
-                           setShowTrailer(true);
-                           setPlaying(true);
-                        }}
-                     >
-                        <Text style={{ color: Colors.btnText }}>
-                           Watch Trailer
-                        </Text>
-                     </TouchableOpacity>
+                     {trailerKey && (
+                        <TouchableOpacity
+                           style={styles.trailerBtn}
+                           onPress={() => {
+                              if (!trailerKey) return;
+                              setShowTrailer(true);
+                              setPlaying(true);
+                           }}
+                        >
+                           <Text style={{ color: Colors.btnText }}>
+                              Watch Trailer
+                           </Text>
+                        </TouchableOpacity>
+                     )}
                   </View>
                </View>
             </View>
