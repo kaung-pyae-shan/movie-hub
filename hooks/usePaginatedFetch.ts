@@ -7,7 +7,7 @@ type PaginatedResponse<T> = {
 };
 
 export default function usePaginatedFetch<T>(
-   fetchFn: (page: number) => Promise<PaginatedResponse<T>>,
+   fetchFn: ((page: number) => Promise<PaginatedResponse<T>>) | null,
 ) {
    const [data, setData] = useState<T[]>([]);
    const [page, setPage] = useState(1);
@@ -16,6 +16,7 @@ export default function usePaginatedFetch<T>(
    const [hasMore, setHasMore] = useState(true);
 
    const load = async (pageNumber: number) => {
+      if (!fetchFn) return;
       if (loading || !hasMore) return;
 
       setLoading(true);
@@ -42,9 +43,17 @@ export default function usePaginatedFetch<T>(
       }
    };
 
+   // Reset data if fetchFn changes
    useEffect(() => {
-      load(1);
-   }, []);
+      setData([]);
+      setPage(1);
+      setHasMore(true);
+      setError(null);
+
+      if (fetchFn) {
+         load(1);
+      }
+   }, [fetchFn]);
 
    const loadMore = () => {
       if (hasMore && !loading) {

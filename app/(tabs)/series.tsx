@@ -1,15 +1,13 @@
-import ActorProfile from "@/components/ActorProfile";
 import Header from "@/components/Header";
 import HorizontalList from "@/components/HorizontalList";
-import MovieCard from "@/components/MovieCard";
 import SerieCard from "@/components/SerieCard";
 import { Colors } from "@/constants/Colors";
 import usePaginatedFetch from "@/hooks/usePaginatedFetch";
-import { fetchPopularActors } from "@/services/actorService";
-import { fetchLatestMovies, fetchPopularMovies, fetchTopRatedMovies, fetchTrendings } from "@/services/movieService";
-import { fetchLatestSeries, fetchPopularSeries, fetchTopRatedSeries } from "@/services/serieService";
-import { Movie } from "@/types/movie";
-import { Person } from "@/types/person";
+import {
+   fetchLatestSeries,
+   fetchPopularSeries,
+   fetchTopRatedSeries,
+} from "@/services/serieService";
 import { Serie } from "@/types/serie";
 import {
    ActivityIndicator,
@@ -49,9 +47,13 @@ export default function SeriesScreen() {
             showsVerticalScrollIndicator={false}
             contentContainerStyle={{ minHeight: "100%", paddingBottom: 10 }}
          >
-            {latestSeriesLoading && topRatedSeriesLoading && popularSeriesLoading ? (
+            {latestSeriesLoading &&
+            topRatedSeriesLoading &&
+            popularSeriesLoading ? (
                <ActivityIndicator size="large" color={Colors.card} />
-            ) : latestSeriesError || topRatedSeriesError || popularSeriesError ? (
+            ) : latestSeriesError ||
+              topRatedSeriesError ||
+              popularSeriesError ? (
                <Text>Error: {popularSeriesError?.message}</Text>
             ) : (
                <View>

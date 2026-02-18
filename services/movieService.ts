@@ -1,9 +1,9 @@
+import { Credits } from "@/types/credits";
 import { Movie } from "@/types/movie";
 import { MovieDetail } from "@/types/movieDetail";
-import { Person } from "@/types/person";
-import { TMDB_CONFIG } from "./config";
-import { Credits } from "@/types/credits";
 import { Trailer } from "@/types/trailer";
+import { TMDB_CONFIG } from "./config";
+import { Genre } from "@/types/genre";
 
 type MovieResponse = {
    page: number;
@@ -104,9 +104,7 @@ export const fetchMovieDetails = async (
    return data;
 };
 
-export const fetchMovieVideos = async (
-   movieId: string,
-): Promise<Trailer> => {
+export const fetchMovieVideos = async (movieId: string): Promise<Trailer> => {
    const endpoint = `${TMDB_CONFIG.BASE_URL}/movie/${movieId}/videos`;
    const response = await fetch(endpoint, {
       method: "GET",
@@ -121,9 +119,7 @@ export const fetchMovieVideos = async (
    return data;
 };
 
-export const fetchMoviesCasts = async (
-   movieId: string,
-): Promise<Credits> => {
+export const fetchMoviesCasts = async (movieId: string): Promise<Credits> => {
    const endpoint = `${TMDB_CONFIG.BASE_URL}/movie/${movieId}/credits`;
    const response = await fetch(endpoint, {
       method: "GET",
@@ -135,5 +131,35 @@ export const fetchMoviesCasts = async (
    }
 
    const data: Credits = await response.json();
+   return data;
+};
+
+export const fetchMovieGenres = async (): Promise<Genre[]> => {
+   const endpoint = `${TMDB_CONFIG.BASE_URL}/genre/movie/list`;
+   const response = await fetch(endpoint, {
+      method: "GET",
+      headers: TMDB_CONFIG.headers,
+   });
+
+   if (!response.ok) {
+      throw new Error(`Failed to fetch movie genres: ${response.statusText}`);
+   }
+
+   const data: { genres: Genre[] } = await response.json();
+   return data.genres;
+};
+
+export const fetchMoviesByGenre = async (genreId: number, page: number = 1): Promise<MovieResponse> => {
+   const endpoint = `${TMDB_CONFIG.BASE_URL}/discover/movie?with_genres=${genreId}&page=${page}`;
+   const response = await fetch(endpoint, {
+      method: "GET",
+      headers: TMDB_CONFIG.headers,
+   });
+
+   if (!response.ok) {
+      throw new Error(`Failed to fetch movies by genre: ${response.statusText}`);
+   }
+
+   const data: MovieResponse = await response.json();
    return data;
 };

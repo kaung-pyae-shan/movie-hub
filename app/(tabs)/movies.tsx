@@ -1,16 +1,19 @@
-import ActorProfile from "@/components/ActorProfile";
+import GenreDropdown from "@/components/GenreDropdown";
 import Header from "@/components/Header";
 import HorizontalList from "@/components/HorizontalList";
 import MovieCard from "@/components/MovieCard";
-import SerieCard from "@/components/SerieCard";
 import { Colors } from "@/constants/Colors";
 import usePaginatedFetch from "@/hooks/usePaginatedFetch";
-import { fetchPopularActors } from "@/services/actorService";
-import { fetchLatestMovies, fetchPopularMovies, fetchTopRatedMovies, fetchTrendings } from "@/services/movieService";
-import { fetchLatestSeries } from "@/services/serieService";
+import {
+   fetchLatestMovies,
+   fetchMovieGenres,
+   fetchMoviesByGenre,
+   fetchPopularMovies,
+   fetchTopRatedMovies,
+} from "@/services/movieService";
+import { Genre } from "@/types/genre";
 import { Movie } from "@/types/movie";
-import { Person } from "@/types/person";
-import { Serie } from "@/types/serie";
+import { useEffect, useState } from "react";
 import {
    ActivityIndicator,
    ScrollView,
@@ -21,6 +24,26 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function MoviesScreen() {
+   const [genres, setGenres] = useState<Genre[]>([]);
+   const [selectedGenre, setSelectedGenre] = useState<number | null>(0);
+
+   useEffect(() => {
+      fetchMovieGenres().then((data) => {
+         setGenres([{ id: 0, name: "All" }, ...data]);
+      });
+   }, []);
+
+   const {
+      data: filteredMovies,
+      loading: filteredLoading,
+      error: filteredError,
+      loadMore: loadMoreFiltered,
+   } = usePaginatedFetch(
+      selectedGenre !== null && selectedGenre !== 0
+         ? (page) => fetchMoviesByGenre(selectedGenre, page)
+         : null,
+   );
+
    const {
       data: latestMovies,
       loading: latestMoviesLoading,
@@ -45,13 +68,42 @@ export default function MoviesScreen() {
    return (
       <SafeAreaView style={styles.container}>
          <Header />
+         <GenreDropdown
+            genres={genres}
+            selectedGenre={selectedGenre}
+            onSelect={setSelectedGenre}
+         />
          <ScrollView
             showsVerticalScrollIndicator={false}
             contentContainerStyle={{ minHeight: "100%", paddingBottom: 10 }}
          >
-            {latestMoviesLoading && topRatedMoviesLoading && popularMoviesLoading ? (
+            {selectedGenre !== null && selectedGenre !== 0 ? (
+               // Show only filtered results when a specific genre is selected
+               filteredLoading ? (
+                  <ActivityIndicator size="large" color={Colors.card} />
+               ) : filteredError ? (
+                  <Text>Error: {filteredError.message}</Text>
+               ) : (
+                  <HorizontalList<Movie>
+                     title={
+                        genres.find((g) => g.id === selectedGenre)?.name ||
+                        "Filtered"
+                     }
+                     data={filteredMovies}
+                     loadMore={loadMoreFiltered}
+                     loading={filteredLoading}
+                     keyExtractor={(item) => item.id.toString()}
+                     renderItem={({ item }) => <MovieCard {...item} />}
+                  />
+               )
+            ) : // Show default lists when "All" is selected
+            latestMoviesLoading &&
+              topRatedMoviesLoading &&
+              popularMoviesLoading ? (
                <ActivityIndicator size="large" color={Colors.card} />
-            ) : latestMoviesError || topRatedMoviesError || popularMoviesError ? (
+            ) : latestMoviesError ||
+              topRatedMoviesError ||
+              popularMoviesError ? (
                <Text>Error: {popularMoviesError?.message}</Text>
             ) : (
                <View>
