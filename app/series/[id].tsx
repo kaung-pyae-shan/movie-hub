@@ -1,4 +1,5 @@
 import CastGrid from "@/components/CastGrid";
+import SeasonList from "@/components/SeasonList";
 import { Colors } from "@/constants/Colors";
 import useFetch from "@/hooks/useFetch";
 import { fetchMoviesCasts, fetchMovieVideos } from "@/services/movieService";
@@ -130,6 +131,8 @@ export default function SerieDetails() {
                   <Text style={styles.title}>Overview</Text>
                   <Text style={styles.text}>{serie.overview}</Text>
                </View>
+
+               <SeasonList seasons={serie.seasons} />
 
                {castsAndCrews?.cast?.length ? (
                   <CastGrid title="Casts" casts={castsAndCrews.cast} />
