@@ -3,6 +3,7 @@ import { TMDB_CONFIG } from "./config";
 import { SerieDetail } from "@/types/serieDetail";
 import { Credits } from "@/types/credits";
 import { Trailer } from "@/types/trailer";
+import { Genre } from "@/types/genre";
 
 type SerieResponse = {
    page: number;
@@ -114,5 +115,35 @@ export const fetchSerieCasts = async (
    }
 
    const data: Credits = await response.json();
+   return data;
+};
+
+export const fetchSerieGenres = async (): Promise<Genre[]> => {
+   const endpoint = `${TMDB_CONFIG.BASE_URL}/genre/tv/list`;
+   const response = await fetch(endpoint, {
+      method: "GET",
+      headers: TMDB_CONFIG.headers,
+   });
+
+   if (!response.ok) {
+      throw new Error(`Failed to fetch movie genres: ${response.statusText}`);
+   }
+
+   const data: { genres: Genre[] } = await response.json();
+   return data.genres;
+};
+
+export const fetchSeriesByGenre = async (genreId: number, page: number = 1): Promise<SerieResponse> => {
+   const endpoint = `${TMDB_CONFIG.BASE_URL}/discover/tv?with_genres=${genreId}&page=${page}`;
+   const response = await fetch(endpoint, {
+      method: "GET",
+      headers: TMDB_CONFIG.headers,
+   });
+
+   if (!response.ok) {
+      throw new Error(`Failed to fetch series by genre: ${response.statusText}`);
+   }
+
+   const data: SerieResponse = await response.json();
    return data;
 };
