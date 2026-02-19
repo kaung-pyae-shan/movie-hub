@@ -7,11 +7,12 @@ import {
    fetchSerieDetails,
    fetchSerieVideos,
 } from "@/services/serieService";
+import { getFavorites, toggleFavorite } from "@/storage/favoriteStorage";
 import { getPoster } from "@/util/image";
 import Entypo from "@expo/vector-icons/Entypo";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
    ActivityIndicator,
    Image,
@@ -38,6 +39,37 @@ export default function SerieDetails() {
    const { data: serie, loading } = useFetch(() =>
       fetchSerieDetails(id as string),
    );
+
+   const [isFavourite, setIsFavourite] = useState(false);
+
+   useEffect(() => {
+      if (!serie) return;
+      const checkFavourite = async () => {
+         const favourites = await getFavorites();
+         const exists = favourites.find(
+            (fav) => fav.id === serie.id && fav.mediaType === "tv",
+         );
+         setIsFavourite(!!exists);
+      };
+
+      if (serie.id) checkFavourite();
+   }, [serie]);
+
+   const handleToggleFavorite = async () => {
+      if (!serie) return;
+      const updated = await toggleFavorite({
+         id: serie.id,
+         title: serie.name,
+         poster_path: serie.poster_path,
+         mediaType: "tv",
+      });
+
+      const exists = updated.find(
+         (fav) => fav.id === serie.id && fav.mediaType === "tv",
+      );
+
+      setIsFavourite(!!exists);
+   };
 
    const { data: castsAndCrews } = useFetch(() =>
       fetchSerieCasts(id as string),
@@ -99,20 +131,17 @@ export default function SerieDetails() {
                         </Text>
                      </View>
 
-                     <View style={styles.badge}>
+                     <TouchableOpacity
+                        style={styles.badge}
+                        onPress={handleToggleFavorite}
+                     >
                         <Ionicons
-                           name="bookmark-outline"
+                           name={isFavourite ? "bookmark" : "bookmark-outline"}
                            size={18}
-                           color={Colors.text}
+                           color={isFavourite ? "#FFD700" : "#fff"}
                         />
-                     </View>
-                     {/* <View style={styles.badge}>
-                        <Ionicons
-                           name="bookmark"
-                           size={18}
-                           color="yellow"
-                        />
-                     </View> */}
+                     </TouchableOpacity>
+
                      {trailerKey && (
                         <TouchableOpacity
                            style={styles.trailerBtn}

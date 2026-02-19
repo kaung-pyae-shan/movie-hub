@@ -84,7 +84,6 @@ export default function SeriesScreen() {
       />
       {selectedGenre !== null && selectedGenre !== 0 ? (
         <FlatList
-          showsHorizontalScrollIndicator={false}
           data={filteredSeries}
           renderItem={({ item }) => <SerieCard {...item} />}
           keyExtractor={(item) => item.id.toString()}
