@@ -12,6 +12,8 @@ export type Movie = {
   poster_path: string | null;
   media_type: string;
   release_date: string;
+  credit_id: string;
+  character: string;
   video: boolean;
   vote_average: number;
   vote_count: number;

@@ -8,6 +8,8 @@ export type Serie = {
   popularity: number;
   poster_path: string | null;
   first_air_date: string;
+  credit_id: string;
+  character: string;
   video: boolean;
   vote_average: number;
   vote_count: number;

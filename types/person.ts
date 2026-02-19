@@ -4,4 +4,5 @@ export type Person = {
   adult: boolean;
   gender: number;
   profile_path: string | null;
+  biography: string;
 };

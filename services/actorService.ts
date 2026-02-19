@@ -26,3 +26,21 @@ export const fetchPopularActors = async (
    const data: ActorResponse = await response.json();
    return data;
 };
+
+export const fetchActorDetails = async (
+   actorId: string,
+): Promise<Person> => {
+   const endpoint = `${TMDB_CONFIG.BASE_URL}/person/${actorId}`;
+
+   const response = await fetch(endpoint, {
+      method: "GET",
+      headers: TMDB_CONFIG.headers,
+   });
+
+   if (!response.ok) {
+      throw new Error(`Failed to fetch actor details: ${response.statusText}`);
+   }
+
+   const data: Person = await response.json();
+   return data;
+};
