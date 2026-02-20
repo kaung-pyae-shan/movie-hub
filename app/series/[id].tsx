@@ -1,4 +1,5 @@
 import CastGrid from "@/components/CastGrid";
+import { FloatingBack } from "@/components/FloatingBack";
 import SeasonList from "@/components/SeasonList";
 import { Colors } from "@/constants/Colors";
 import useFetch from "@/hooks/useFetch";
@@ -28,7 +29,6 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import YoutubePlayer from "react-native-youtube-iframe";
 
 export default function SerieDetails() {
-   const router = useRouter();
    const { id } = useLocalSearchParams();
 
    const [showTrailer, setShowTrailer] = useState(false);
@@ -95,6 +95,7 @@ export default function SerieDetails() {
 
    return (
       <SafeAreaView style={styles.container}>
+         <FloatingBack />
          <ScrollView>
             <View style={styles.movieHeader}>
                <Image

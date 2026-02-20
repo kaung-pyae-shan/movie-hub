@@ -1,4 +1,5 @@
 import CastGrid from "@/components/CastGrid";
+import { FloatingBack } from "@/components/FloatingBack";
 import { Colors } from "@/constants/Colors";
 import useFetch from "@/hooks/useFetch";
 import {
@@ -27,7 +28,6 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import YoutubePlayer from "react-native-youtube-iframe";
 
 export default function MovieDetails() {
-   const router = useRouter();
    const { id } = useLocalSearchParams();
 
    const [showTrailer, setShowTrailer] = useState(false);
@@ -94,6 +94,7 @@ export default function MovieDetails() {
 
    return (
       <SafeAreaView style={styles.container}>
+         <FloatingBack />
          <ScrollView>
             <View style={styles.movieHeader}>
                <Image
@@ -214,7 +215,7 @@ const styles = StyleSheet.create({
    container: {
       flex: 1,
       backgroundColor: Colors.background,
-      paddingHorizontal: 20,
+      // paddingHorizontal: 20,
    },
 
    movieHeader: {

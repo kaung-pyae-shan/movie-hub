@@ -1,3 +1,4 @@
+import { FloatingBack } from "@/components/FloatingBack";
 import MovieCard from "@/components/MovieCard";
 import SerieCard from "@/components/SerieCard";
 import { Colors } from "@/constants/Colors";
@@ -9,14 +10,14 @@ import { getPoster } from "@/util/image";
 import { useLocalSearchParams } from "expo-router";
 import React, { useState } from "react";
 import {
-    ActivityIndicator,
-    FlatList,
-    Image,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  ActivityIndicator,
+  FlatList,
+  Image,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -47,6 +48,7 @@ const ActorDetails = () => {
 
   return (
     <SafeAreaView style={styles.container}>
+      <FloatingBack />
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={styles.profile}>
           {actor.profile_path ? (
