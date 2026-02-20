@@ -5,10 +5,10 @@ import { Link } from "expo-router";
 import React from "react";
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
-const ActorProfile = ({ id, name, profile_path }: Person) => {
+const ActorProfile = ({ id, name, profile_path, onPress }: Person & { onPress?: () => void }) => {
   return (
     <Link href={`../actors/${id}`} asChild>
-      <TouchableOpacity>
+      <TouchableOpacity onPress={onPress}>
         <View style={styles.container}>
           {profile_path ? (
             <Image

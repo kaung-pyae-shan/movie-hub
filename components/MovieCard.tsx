@@ -14,10 +14,11 @@ const MovieCard = ({
    media_type,
    vote_average,
    release_date,
-}: Movie) => {
+   onPress,
+}: Movie & { onPress?: () => void }) => {
    return (
       <Link href={`../movies/${id}`} asChild>
-         <TouchableOpacity>
+         <TouchableOpacity onPress={onPress}>
             <View style={styles.container}>
                {poster_path ? (
                   <Image

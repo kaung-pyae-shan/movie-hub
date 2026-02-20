@@ -13,10 +13,11 @@ const SerieCard = ({
    name,
    vote_average,
    first_air_date,
-}: Serie) => {
+   onPress,
+}: Serie & { onPress?: () => void }) => {
    return (
       <Link href={`../series/${id}`} asChild>
-         <TouchableOpacity>
+         <TouchableOpacity onPress={onPress}>
             <View style={styles.container}>
                <Image
                   source={{ uri: getPoster(poster_path) }}

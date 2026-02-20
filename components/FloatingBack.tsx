@@ -12,7 +12,6 @@ export function FloatingBack() {
 
 const styles = StyleSheet.create({
   backButton: {
-
     position: "absolute",
     top: 60,
     right: 22,
