@@ -12,6 +12,7 @@ export type Movie = {
   poster_path: string | null;
   media_type: string;
   release_date: string;
+  first_air_date: string;
   credit_id: string;
   character: string;
   video: boolean;
