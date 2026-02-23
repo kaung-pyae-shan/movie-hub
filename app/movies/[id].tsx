@@ -215,13 +215,12 @@ const styles = StyleSheet.create({
    container: {
       flex: 1,
       backgroundColor: Colors.background,
-      // paddingHorizontal: 20,
+      paddingHorizontal: 20,
    },
 
    movieHeader: {
       flexDirection: "row",
       gap: 20,
-      marginBottom: 20,
    },
 
    text: {
@@ -229,6 +228,7 @@ const styles = StyleSheet.create({
    },
 
    title: {
+      marginVertical: 10,
       color: Colors.text,
       fontSize: 18,
       fontWeight: "bold",

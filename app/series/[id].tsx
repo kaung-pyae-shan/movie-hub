@@ -97,7 +97,7 @@ export default function SerieDetails() {
       <SafeAreaView style={styles.container}>
          <FloatingBack />
          <ScrollView>
-            <View style={styles.movieHeader}>
+            <View>
                <Image
                   source={{
                      uri: getPoster(serie.backdrop_path ?? null),
@@ -254,11 +254,6 @@ const styles = StyleSheet.create({
    container: {
       flex: 1,
       backgroundColor: Colors.background,
-      // paddingHorizontal: 20,
-   },
-
-   movieHeader: {
-      marginBottom: 20,
    },
 
    text: {
@@ -266,6 +261,7 @@ const styles = StyleSheet.create({
    },
 
    title: {
+      marginVertical: 10,
       color: Colors.text,
       fontSize: 18,
       fontWeight: "bold",
