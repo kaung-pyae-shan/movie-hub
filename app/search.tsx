@@ -1,16 +1,20 @@
-// app/search.tsx
-
 import ActorProfile from "@/components/ActorProfile";
 import HorizontalList from "@/components/HorizontalList";
 import MovieCard from "@/components/MovieCard";
 import SerieCard from "@/components/SerieCard";
 import { Colors } from "@/constants/Colors";
 import useSearchFetch from "@/hooks/useSearchFetch";
+import {
+  addToSearchHistory,
+  clearSearchHistory,
+  deleteSearchHistoryItem,
+  getSearchHistory,
+} from "@/storage/historyStorage";
+import { HistoryItem } from "@/types/historyItem";
 import { Movie } from "@/types/movie";
 import { Person } from "@/types/person";
 import { Serie } from "@/types/serie";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router } from "expo-router";
 import React, { useCallback, useEffect, useState } from "react";
 import {
@@ -25,14 +29,6 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-const HISTORY_KEY = "search_history";
-const MAX_HISTORY = 10;
-
-type HistoryItem = {
-  query: string;
-  timestamp: number;
-};
-
 const SearchScreen = () => {
   const [query, setQuery] = useState("");
   const [history, setHistory] = useState<HistoryItem[]>([]);
@@ -40,56 +36,26 @@ const SearchScreen = () => {
   const { results, loading, loadMore } = useSearchFetch(query);
 
   useEffect(() => {
-    loadHistory();
+    const load = async () => {
+      const data = await getSearchHistory();
+      setHistory(data);
+    };
+    load();
   }, []);
 
-  const loadHistory = async () => {
-    try {
-      const raw = await AsyncStorage.getItem(HISTORY_KEY);
-      if (raw) setHistory(JSON.parse(raw));
-    } catch (e) {
-      console.error("Failed to load search history:", e);
-    }
-  };
-
   const saveToHistory = useCallback(async (searchQuery: string) => {
-    if (!searchQuery.trim()) return;
-    try {
-      const raw = await AsyncStorage.getItem(HISTORY_KEY);
-      const existing: HistoryItem[] = raw ? JSON.parse(raw) : [];
-      const filtered = existing.filter(
-        (h) => h.query.toLowerCase() !== searchQuery.toLowerCase()
-      );
-      const updated: HistoryItem[] = [
-        { query: searchQuery, timestamp: Date.now() },
-        ...filtered,
-      ].slice(0, MAX_HISTORY);
-      await AsyncStorage.setItem(HISTORY_KEY, JSON.stringify(updated));
-      setHistory(updated);
-    } catch (e) {
-      console.error("Failed to save search history:", e);
-    }
+    const updated = await addToSearchHistory(searchQuery);
+    setHistory(updated);
   }, []);
 
   const deleteHistoryItem = useCallback(async (queryToDelete: string) => {
-    try {
-      const raw = await AsyncStorage.getItem(HISTORY_KEY);
-      const existing: HistoryItem[] = raw ? JSON.parse(raw) : [];
-      const updated = existing.filter((h) => h.query !== queryToDelete);
-      await AsyncStorage.setItem(HISTORY_KEY, JSON.stringify(updated));
-      setHistory(updated);
-    } catch (e) {
-      console.error("Failed to delete history item:", e);
-    }
+    const updated = await deleteSearchHistoryItem(queryToDelete);
+    setHistory(updated);
   }, []);
 
   const clearHistory = useCallback(async () => {
-    try {
-      await AsyncStorage.removeItem(HISTORY_KEY);
-      setHistory([]);
-    } catch (e) {
-      console.error("Failed to clear history:", e);
-    }
+    await clearSearchHistory();
+    setHistory([]);
   }, []);
 
   const handleHistoryPress = (historyQuery: string) => {
@@ -124,10 +90,20 @@ const SearchScreen = () => {
           />
           {query.length > 0 ? (
             <Pressable onPress={() => setQuery("")}>
-              <Ionicons name="close-circle" size={20} color="#888" style={styles.searchIcon} />
+              <Ionicons
+                name="close-circle"
+                size={20}
+                color="#888"
+                style={styles.searchIcon}
+              />
             </Pressable>
           ) : (
-            <Ionicons name="search" size={20} color="#888" style={styles.searchIcon} />
+            <Ionicons
+              name="search"
+              size={20}
+              color="#888"
+              style={styles.searchIcon}
+            />
           )}
         </View>
       </View>
@@ -157,7 +133,9 @@ const SearchScreen = () => {
                     <Ionicons name="time-outline" size={16} color="#888" />
                     <Text style={styles.historyText}>{item.query}</Text>
                   </TouchableOpacity>
-                  <TouchableOpacity onPress={() => deleteHistoryItem(item.query)}>
+                  <TouchableOpacity
+                    onPress={() => deleteHistoryItem(item.query)}
+                  >
                     <Ionicons name="close" size={16} color="#888" />
                   </TouchableOpacity>
                 </View>
@@ -208,7 +186,10 @@ const SearchScreen = () => {
                 loading={loading}
                 keyExtractor={(item) => `actor-${item.id}`}
                 renderItem={({ item }) => (
-                  <ActorProfile {...item} onPress={() => saveToHistory(query)} />
+                  <ActorProfile
+                    {...item}
+                    onPress={() => saveToHistory(query)}
+                  />
                 )}
               />
             )}
