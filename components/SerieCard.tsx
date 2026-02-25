@@ -1,5 +1,4 @@
 import { Colors } from "@/constants/Colors";
-import { Movie } from "@/types/movie";
 import { Serie } from "@/types/serie";
 import { getPoster } from "@/util/image";
 import Entypo from "@expo/vector-icons/Entypo";
@@ -19,11 +18,19 @@ const SerieCard = ({
       <Link href={`../series/${id}`} asChild>
          <TouchableOpacity onPress={onPress}>
             <View style={styles.container}>
-               <Image
-                  source={{ uri: getPoster(poster_path) }}
-                  style={{ width: 100, height: 150 }}
-                  resizeMode="cover"
-               />
+               {poster_path ? (
+                  <Image
+                     source={{ uri: getPoster(poster_path) }}
+                     style={{ width: 100, height: 150 }}
+                     resizeMode="cover"
+                  />
+               ) : (
+                  <Image
+                     source={require("../assets/images/placeholder-portrait.png")}
+                     style={{ width: 100, height: 150 }}
+                     resizeMode="cover"
+                  />
+               )}
 
                <View style={styles.movieContentContainer}>
                   <Text style={{ color: Colors.btnText }} numberOfLines={1}>

@@ -27,9 +27,11 @@ const MovieCard = ({
                      resizeMode="cover"
                   />
                ) : (
-                  <View style={{backgroundColor: Colors.background, width: 100, height: 150, justifyContent: "center", alignItems: "center"}}>
-                     <Text style={{ color: Colors.btnText, textAlign: "center" }}>No Poster Available</Text>
-                  </View>
+                  <Image
+                     source={require("../assets/images/placeholder-portrait.png")}
+                     style={{ width: 100, height: 150 }}
+                     resizeMode="cover"
+                  />
                )}
 
                <View style={styles.movieContentContainer}>

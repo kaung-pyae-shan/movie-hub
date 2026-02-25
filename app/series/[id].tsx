@@ -12,7 +12,7 @@ import { getFavorites, toggleFavorite } from "@/storage/favoriteStorage";
 import { getPoster } from "@/util/image";
 import Entypo from "@expo/vector-icons/Entypo";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { useLocalSearchParams, useRouter } from "expo-router";
+import { useLocalSearchParams } from "expo-router";
 import { useEffect, useMemo, useState } from "react";
 import {
    ActivityIndicator,
@@ -33,6 +33,7 @@ export default function SerieDetails() {
 
    const [showTrailer, setShowTrailer] = useState(false);
    const [playing, setPlaying] = useState(false);
+   const [isVideoReady, setIsVideoReady] = useState(false);
 
    const { data: videos } = useFetch(() => fetchSerieVideos(id as string));
 
@@ -98,13 +99,22 @@ export default function SerieDetails() {
          <FloatingBack />
          <ScrollView>
             <View>
-               <Image
-                  source={{
-                     uri: getPoster(serie.backdrop_path ?? null),
-                  }}
-                  style={{ width: "100%", height: 225, borderRadius: 10 }}
-                  resizeMode="cover"
-               />
+               {serie.backdrop_path ? (
+                  <Image
+                     source={{
+                        uri: getPoster(serie.backdrop_path ?? null),
+                     }}
+                     style={{ width: "100%", height: 225, borderRadius: 10 }}
+                     resizeMode="cover"
+                  />
+               ) : (
+                  <Image
+                     source={require("../../assets/images/placeholder-landscape.png")}
+                     style={{ width: "100%", height: 225, borderRadius: 10 }}
+                     resizeMode="cover"
+                  />
+               )}
+
                <View
                   style={{
                      width: "100%",
@@ -148,6 +158,7 @@ export default function SerieDetails() {
                            style={styles.trailerBtn}
                            onPress={() => {
                               if (!trailerKey) return;
+                              setIsVideoReady(false);
                               setShowTrailer(true);
                               setPlaying(true);
                            }}
@@ -233,11 +244,20 @@ export default function SerieDetails() {
 
                   {/* YouTube Player */}
                   {trailerKey ? (
-                     <YoutubePlayer
-                        height={230}
-                        play={playing}
-                        videoId={trailerKey}
-                     />
+                     <View style={{ position: "relative" }}>
+                        {!isVideoReady && (
+                           <View style={styles.loaderContainer}>
+                              <ActivityIndicator size="large" color="#fff" />
+                           </View>
+                        )}
+
+                        <YoutubePlayer
+                           height={230}
+                           play={playing}
+                           videoId={trailerKey}
+                           onReady={() => setIsVideoReady(true)}
+                        />
+                     </View>
                   ) : (
                      <Text style={{ color: "#fff", textAlign: "center" }}>
                         No trailer available
@@ -322,5 +342,17 @@ const styles = StyleSheet.create({
       top: -40,
       right: 20,
       zIndex: 10,
+   },
+
+   loaderContainer: {
+      position: "absolute",
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      justifyContent: "center",
+      alignItems: "center",
+      backgroundColor: "black",
+      zIndex: 5,
    },
 });
