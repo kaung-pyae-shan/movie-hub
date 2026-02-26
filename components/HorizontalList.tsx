@@ -1,7 +1,5 @@
 import { Colors } from "@/constants/Colors";
-import { Movie } from "@/types/movie";
-import { Serie } from "@/types/serie";
-import React, { ReactElement, useCallback } from "react";
+import React, { ReactElement } from "react";
 import {
   ActivityIndicator,
   FlatList,
@@ -9,8 +7,6 @@ import {
   Text,
   View,
 } from "react-native";
-import MovieCard from "./MovieCard";
-import SerieCard from "./SerieCard";
 
 type HorizontalListProps<T> = {
   title: string;
@@ -20,16 +16,6 @@ type HorizontalListProps<T> = {
   keyExtractor: (item: T) => string;
   renderItem: ({ item }: { item: T }) => ReactElement;
 };
-
-const renderMovieItem = useCallback(
-  ({ item }: { item: Movie }) => <MovieCard {...item} />,
-  [],
-);
-
-const renderSerieItem = useCallback(
-  ({ item }: { item: Serie }) => <SerieCard {...item} />,
-  [],
-);
 
 const HorizontalList = <T,>({
   title,

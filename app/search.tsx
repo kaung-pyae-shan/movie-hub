@@ -149,7 +149,7 @@ const SearchScreen = () => {
         )}
 
         {noResults && (
-          <Text style={styles.statusText}>No results for "{query}"</Text>
+          <Text style={styles.statusText}>{`No results for "${query}"`}</Text>
         )}
 
         {showResults && (

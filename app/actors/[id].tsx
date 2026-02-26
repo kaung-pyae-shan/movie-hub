@@ -25,17 +25,17 @@ const ActorDetails = () => {
   const [expanded, setExpanded] = useState(false);
   const { id } = useLocalSearchParams();
 
-  if (!id) return <Text>Invalid actor ID</Text>;
+  // if (!id) return <Text>Invalid actor ID</Text>;
 
   const { data: actor, loading } = useFetch(() =>
     fetchActorDetails(id as string),
   );
 
-  const { data: movies, loading: moviesLoading } = useFetch(() =>
+  const { data: movies } = useFetch(() =>
     fetchActorSpecificMovies(id as string),
   );
 
-  const { data: series, loading: seriesLoading } = useFetch(() =>
+  const { data: series } = useFetch(() =>
     fetchActorSpecificSeries(id as string),
   );
 
