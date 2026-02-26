@@ -28,331 +28,347 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import YoutubePlayer from "react-native-youtube-iframe";
 
+const POSTER_WIDTH = "100%";
+const POSTER_HEIGHT = 225;
+
 export default function SerieDetails() {
-   const { id } = useLocalSearchParams();
+  const { id } = useLocalSearchParams();
 
-   const [showTrailer, setShowTrailer] = useState(false);
-   const [playing, setPlaying] = useState(false);
-   const [isVideoReady, setIsVideoReady] = useState(false);
+  const [backDropLoading, setBackdropLoading] = useState(true);
 
-   const { data: videos } = useFetch(() => fetchSerieVideos(id as string));
+  const [showTrailer, setShowTrailer] = useState(false);
+  const [playing, setPlaying] = useState(false);
+  const [isVideoReady, setIsVideoReady] = useState(false);
 
-   const { data: serie, loading } = useFetch(() =>
-      fetchSerieDetails(id as string),
-   );
+  const { data: videos } = useFetch(() => fetchSerieVideos(id as string));
 
-   const [isFavourite, setIsFavourite] = useState(false);
+  const { data: serie, loading } = useFetch(() =>
+    fetchSerieDetails(id as string),
+  );
 
-   useEffect(() => {
-      if (!serie) return;
-      const checkFavourite = async () => {
-         const favourites = await getFavorites();
-         const exists = favourites.find(
-            (fav) => fav.id === serie.id && fav.mediaType === "tv",
-         );
-         setIsFavourite(!!exists);
-      };
+  const [isFavourite, setIsFavourite] = useState(false);
 
-      if (serie.id) checkFavourite();
-   }, [serie]);
-
-   const handleToggleFavorite = async () => {
-      if (!serie) return;
-      const updated = await toggleFavorite({
-         id: serie.id,
-         title: serie.name,
-         poster_path: serie.poster_path,
-         mediaType: "tv",
-      });
-
-      const exists = updated.find(
-         (fav) => fav.id === serie.id && fav.mediaType === "tv",
+  useEffect(() => {
+    if (!serie) return;
+    const checkFavourite = async () => {
+      const favourites = await getFavorites();
+      const exists = favourites.find(
+        (fav) => fav.id === serie.id && fav.mediaType === "tv",
       );
-
       setIsFavourite(!!exists);
-   };
+    };
 
-   const { data: castsAndCrews } = useFetch(() =>
-      fetchSerieCasts(id as string),
-   );
+    if (serie.id) checkFavourite();
+  }, [serie]);
 
-   // Get YouTube trailer only
-   const trailerKey = useMemo(() => {
-      if (!videos?.results) return null;
+  const handleToggleFavorite = async () => {
+    if (!serie) return;
+    const updated = await toggleFavorite({
+      id: serie.id,
+      title: serie.name,
+      poster_path: serie.poster_path,
+      mediaType: "tv",
+    });
 
-      const trailer = videos.results.find(
-         (v) => v.site === "YouTube" && v.type === "Trailer",
-      );
+    const exists = updated.find(
+      (fav) => fav.id === serie.id && fav.mediaType === "tv",
+    );
 
-      return trailer?.key ?? null;
-   }, [videos]);
+    setIsFavourite(!!exists);
+  };
 
-   if (loading || !serie)
-      return (
-         <SafeAreaView style={styles.container}>
-            <ActivityIndicator />
-         </SafeAreaView>
-      );
+  const { data: castsAndCrews } = useFetch(() => fetchSerieCasts(id as string));
 
-   return (
+  // Get YouTube trailer only
+  const trailerKey = useMemo(() => {
+    if (!videos?.results) return null;
+
+    const trailer = videos.results.find(
+      (v) => v.site === "YouTube" && v.type === "Trailer",
+    );
+
+    return trailer?.key ?? null;
+  }, [videos]);
+
+  if (loading || !serie)
+    return (
       <SafeAreaView style={styles.container}>
-         <FloatingBack />
-         <ScrollView>
-            <View>
-               {serie.backdrop_path ? (
-                  <Image
-                     source={{
-                        uri: getPoster(serie.backdrop_path ?? null),
-                     }}
-                     style={{ width: "100%", height: 225, borderRadius: 10 }}
-                     resizeMode="cover"
-                  />
-               ) : (
-                  <Image
-                     source={require("../../assets/images/placeholder-landscape.png")}
-                     style={{ width: "100%", height: 225, borderRadius: 10 }}
-                     resizeMode="cover"
-                  />
-               )}
-
-               <View
-                  style={{
-                     width: "100%",
-                     paddingTop: 20,
-                     alignItems: "center",
-                  }}
-               >
-                  <Text style={styles.title}>
-                     {serie.name} ({serie.first_air_date?.split("-")[0]})
-                  </Text>
-                  <Text style={styles.text}>
-                     Episode runtime:{" "}
-                     {serie.episode_run_time[0]
-                        ? `${serie.episode_run_time[0]} min`
-                        : "Not Available"}
-                  </Text>
-                  <Text style={styles.text}>
-                     {serie.genres.map((g) => g.name).join(", ")}
-                  </Text>
-                  <View style={styles.ratingRow}>
-                     <View style={styles.badge}>
-                        <Text style={styles.badgeText}>
-                           <Entypo name="star" size={14} color="yellow" />{" "}
-                           {Math.round(serie.vote_average * 10) / 10}/10
-                        </Text>
-                     </View>
-
-                     <TouchableOpacity
-                        style={styles.badge}
-                        onPress={handleToggleFavorite}
-                     >
-                        <Ionicons
-                           name={isFavourite ? "bookmark" : "bookmark-outline"}
-                           size={18}
-                           color={isFavourite ? "#FFD700" : "#fff"}
-                        />
-                     </TouchableOpacity>
-
-                     {trailerKey && (
-                        <TouchableOpacity
-                           style={styles.trailerBtn}
-                           onPress={() => {
-                              if (!trailerKey) return;
-                              setIsVideoReady(false);
-                              setShowTrailer(true);
-                              setPlaying(true);
-                           }}
-                        >
-                           <Text style={{ color: Colors.btnText }}>
-                              Watch Trailer
-                           </Text>
-                        </TouchableOpacity>
-                     )}
-                  </View>
-               </View>
-            </View>
-
-            <View style={styles.serieContentContainer}>
-               <View>
-                  <Text style={styles.title}>Overview</Text>
-                  <Text style={styles.text}>{serie.overview}</Text>
-               </View>
-
-               <SeasonList seasons={serie.seasons} />
-
-               {castsAndCrews?.cast?.length ? (
-                  <CastGrid title="Casts" casts={castsAndCrews.cast} />
-               ) : (
-                  <>
-                     <Text
-                        style={{
-                           color: Colors.text,
-                           fontSize: 18,
-                           fontWeight: "bold",
-                        }}
-                     >
-                        Casts
-                     </Text>
-                     <Text style={{ color: Colors.text }}>
-                        No casts information available.
-                     </Text>
-                  </>
-               )}
-
-               {castsAndCrews?.crew?.length ? (
-                  <CastGrid title="Crews" casts={castsAndCrews.crew} />
-               ) : (
-                  <>
-                     <Text
-                        style={{
-                           color: Colors.text,
-                           fontSize: 18,
-                           fontWeight: "bold",
-                        }}
-                     >
-                        Crews
-                     </Text>
-                     <Text style={{ color: Colors.text }}>
-                        No crews information available.
-                     </Text>
-                  </>
-               )}
-            </View>
-         </ScrollView>
-
-         <Modal
-            visible={showTrailer}
-            animationType="fade"
-            transparent
-            onRequestClose={() => {
-               setShowTrailer(false);
-               setPlaying(false);
-            }}
-         >
-            <View style={styles.modalOverlay}>
-               <View style={styles.modalContainer}>
-                  {/* Close Button */}
-                  <Pressable
-                     style={styles.closeBtn}
-                     onPress={() => {
-                        setShowTrailer(false);
-                        setPlaying(false);
-                     }}
-                  >
-                     <Entypo name="cross" size={28} color="#fff" />
-                  </Pressable>
-
-                  {/* YouTube Player */}
-                  {trailerKey ? (
-                     <View style={{ position: "relative" }}>
-                        {!isVideoReady && (
-                           <View style={styles.loaderContainer}>
-                              <ActivityIndicator size="large" color="#fff" />
-                           </View>
-                        )}
-
-                        <YoutubePlayer
-                           height={230}
-                           play={playing}
-                           videoId={trailerKey}
-                           onReady={() => setIsVideoReady(true)}
-                        />
-                     </View>
-                  ) : (
-                     <Text style={{ color: "#fff", textAlign: "center" }}>
-                        No trailer available
-                     </Text>
-                  )}
-               </View>
-            </View>
-         </Modal>
+        <ActivityIndicator />
       </SafeAreaView>
-   );
+    );
+
+  return (
+    <SafeAreaView style={styles.container}>
+      <FloatingBack />
+      <ScrollView>
+        <View>
+          <View style={styles.posterWrapper}>
+            {(backDropLoading || !serie.backdrop_path) && (
+              <Image
+                source={require("../../assets/images/placeholder-landscape.png")}
+                style={styles.poster}
+                resizeMode="cover"
+              />
+            )}
+            {serie.backdrop_path && (
+              <Image
+                source={{ uri: getPoster(serie.backdrop_path) }}
+                style={styles.poster}
+                resizeMode="cover"
+                onLoadEnd={() => setBackdropLoading(false)}
+              />
+            )}
+          </View>
+
+          <View
+            style={{
+              width: "100%",
+              paddingTop: 20,
+              alignItems: "center",
+            }}
+          >
+            <Text style={styles.title}>
+              {serie.name} ({serie.first_air_date?.split("-")[0]})
+            </Text>
+            <Text style={styles.text}>
+              Episode runtime:{" "}
+              {serie.episode_run_time[0]
+                ? `${serie.episode_run_time[0]} min`
+                : "Not Available"}
+            </Text>
+            <Text style={styles.text}>
+              {serie.genres.map((g) => g.name).join(", ")}
+            </Text>
+            <View style={styles.ratingRow}>
+              <View style={styles.badge}>
+                <Text style={styles.badgeText}>
+                  <Entypo name="star" size={14} color="yellow" />{" "}
+                  {Math.round(serie.vote_average * 10) / 10}/10
+                </Text>
+              </View>
+
+              <TouchableOpacity
+                style={styles.badge}
+                onPress={handleToggleFavorite}
+              >
+                <Ionicons
+                  name={isFavourite ? "bookmark" : "bookmark-outline"}
+                  size={18}
+                  color={isFavourite ? "#FFD700" : "#fff"}
+                />
+              </TouchableOpacity>
+
+              {trailerKey && (
+                <TouchableOpacity
+                  style={styles.trailerBtn}
+                  onPress={() => {
+                    if (!trailerKey) return;
+                    setIsVideoReady(false);
+                    setShowTrailer(true);
+                    setPlaying(true);
+                  }}
+                >
+                  <Text style={{ color: Colors.btnText }}>Watch Trailer</Text>
+                </TouchableOpacity>
+              )}
+            </View>
+          </View>
+        </View>
+
+        <View style={styles.serieContentContainer}>
+          <View>
+            <Text style={styles.title}>Overview</Text>
+            <Text style={styles.text}>{serie.overview}</Text>
+          </View>
+
+          <SeasonList seasons={serie.seasons} />
+
+          {castsAndCrews?.cast?.length ? (
+            <CastGrid title="Casts" casts={castsAndCrews.cast} />
+          ) : (
+            <>
+              <Text
+                style={{
+                  color: Colors.text,
+                  fontSize: 18,
+                  fontWeight: "bold",
+                }}
+              >
+                Casts
+              </Text>
+              <Text style={{ color: Colors.text }}>
+                No casts information available.
+              </Text>
+            </>
+          )}
+
+          {castsAndCrews?.crew?.length ? (
+            <CastGrid title="Crews" casts={castsAndCrews.crew} />
+          ) : (
+            <>
+              <Text
+                style={{
+                  color: Colors.text,
+                  fontSize: 18,
+                  fontWeight: "bold",
+                }}
+              >
+                Crews
+              </Text>
+              <Text style={{ color: Colors.text }}>
+                No crews information available.
+              </Text>
+            </>
+          )}
+        </View>
+      </ScrollView>
+
+      <Modal
+        visible={showTrailer}
+        animationType="fade"
+        transparent
+        onRequestClose={() => {
+          setShowTrailer(false);
+          setPlaying(false);
+        }}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContainer}>
+            {/* Close Button */}
+            <Pressable
+              style={styles.closeBtn}
+              onPress={() => {
+                setShowTrailer(false);
+                setPlaying(false);
+              }}
+            >
+              <Entypo name="cross" size={28} color="#fff" />
+            </Pressable>
+
+            {/* YouTube Player */}
+            {trailerKey ? (
+              <View style={{ position: "relative" }}>
+                {!isVideoReady && (
+                  <View style={styles.loaderContainer}>
+                    <ActivityIndicator size="large" color="#fff" />
+                  </View>
+                )}
+
+                <YoutubePlayer
+                  height={230}
+                  play={playing}
+                  videoId={trailerKey}
+                  onReady={() => setIsVideoReady(true)}
+                />
+              </View>
+            ) : (
+              <Text style={{ color: "#fff", textAlign: "center" }}>
+                No trailer available
+              </Text>
+            )}
+          </View>
+        </View>
+      </Modal>
+    </SafeAreaView>
+  );
 }
 
 const styles = StyleSheet.create({
-   container: {
-      flex: 1,
-      backgroundColor: Colors.background,
-   },
+  container: {
+    flex: 1,
+    backgroundColor: Colors.background,
+  },
 
-   text: {
-      color: Colors.btnText,
-   },
+  posterWrapper: {
+    width: POSTER_WIDTH,
+    height: POSTER_HEIGHT,
+  },
 
-   title: {
-      marginVertical: 10,
-      color: Colors.text,
-      fontSize: 18,
-      fontWeight: "bold",
-   },
+  poster: {
+    width: POSTER_WIDTH,
+    height: POSTER_HEIGHT,
+    position: "absolute",
+    top: 0,
+    left: 0,
+  },
 
-   ratingRow: {
-      flexDirection: "row",
-      alignItems: "center",
-      justifyContent: "center",
-      gap: 12,
-      marginTop: 10,
-   },
+  text: {
+    color: Colors.btnText,
+  },
 
-   badge: {
-      backgroundColor: Colors.btnColor,
-      paddingHorizontal: 8,
-      paddingVertical: 4,
-      borderRadius: 20,
-   },
+  title: {
+    marginVertical: 10,
+    color: Colors.text,
+    fontSize: 18,
+    fontWeight: "bold",
+  },
 
-   badgeText: {
-      color: Colors.btnText,
-      fontSize: 13,
-      fontWeight: "600",
-   },
+  ratingRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 12,
+    marginTop: 10,
+  },
 
-   trailerBtn: {
-      borderWidth: 1,
-      borderColor: Colors.btnText,
-      backgroundColor: Colors.btnColor,
-      borderRadius: 8,
-      paddingVertical: 8,
-      alignItems: "center",
-      width: 140,
-   },
+  badge: {
+    backgroundColor: Colors.btnColor,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 20,
+  },
 
-   trailerBtnText: {
-      color: Colors.text,
-      fontWeight: "600",
-   },
+  badgeText: {
+    color: Colors.btnText,
+    fontSize: 13,
+    fontWeight: "600",
+  },
 
-   serieContentContainer: {
-      paddingHorizontal: 20,
-   },
+  trailerBtn: {
+    borderWidth: 1,
+    borderColor: Colors.btnText,
+    backgroundColor: Colors.btnColor,
+    borderRadius: 8,
+    paddingVertical: 8,
+    alignItems: "center",
+    width: 140,
+  },
 
-   modalOverlay: {
-      flex: 1,
-      backgroundColor: "rgba(0,0,0,0.85)",
-      justifyContent: "center",
-   },
+  trailerBtnText: {
+    color: Colors.text,
+    fontWeight: "600",
+  },
 
-   modalContainer: {
-      paddingHorizontal: 20,
-   },
+  serieContentContainer: {
+    paddingHorizontal: 20,
+  },
 
-   closeBtn: {
-      position: "absolute",
-      top: -40,
-      right: 20,
-      zIndex: 10,
-   },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.85)",
+    justifyContent: "center",
+  },
 
-   loaderContainer: {
-      position: "absolute",
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0,
-      justifyContent: "center",
-      alignItems: "center",
-      backgroundColor: "black",
-      zIndex: 5,
-   },
+  modalContainer: {
+    paddingHorizontal: 20,
+  },
+
+  closeBtn: {
+    position: "absolute",
+    top: -40,
+    right: 20,
+    zIndex: 10,
+  },
+
+  loaderContainer: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "black",
+    zIndex: 5,
+  },
 });

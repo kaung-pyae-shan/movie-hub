@@ -168,3 +168,18 @@ export const fetchActorSpecificSeries = async (
   const data: ActorSerieResponse = await response.json();
   return data;
 };
+
+export const fetchSeasonDetails = async (
+  serieId: string,
+  seasonNumber: number,
+) => {
+  const endpoint = `${TMDB_CONFIG.BASE_URL}/tv/${serieId}/season/${seasonNumber}`;
+  const response = await fetch(endpoint, {
+    method: "GET",
+    headers: TMDB_CONFIG.headers,
+  });
+
+  if (!response.ok) throw new Error("Failed to fetch season details");
+
+  return response.json();
+};

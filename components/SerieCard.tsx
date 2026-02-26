@@ -3,72 +3,93 @@ import { Serie } from "@/types/serie";
 import { getPoster } from "@/util/image";
 import Entypo from "@expo/vector-icons/Entypo";
 import { Link } from "expo-router";
-import React, { memo } from "react";
+import React, { memo, useState } from "react";
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
-const SerieCard = ({
-   id,
-   poster_path,
-   name,
-   vote_average,
-   first_air_date,
-   onPress,
-}: Serie & { onPress?: () => void }) => {
-   return (
-      <Link href={`../series/${id}`} asChild>
-         <TouchableOpacity onPress={onPress}>
-            <View style={styles.container}>
-               {poster_path ? (
-                  <Image
-                     source={{ uri: getPoster(poster_path) }}
-                     style={{ width: 100, height: 150 }}
-                     resizeMode="cover"
-                  />
-               ) : (
-                  <Image
-                     source={require("../assets/images/placeholder-portrait.png")}
-                     style={{ width: 100, height: 150 }}
-                     resizeMode="cover"
-                  />
-               )}
+const POSTER_WIDTH = 100;
+const POSTER_HEIGHT = 150;
 
-               <View style={styles.movieContentContainer}>
-                  <Text style={{ color: Colors.btnText }} numberOfLines={1}>
-                     {name}
-                  </Text>
-                  <View style={styles.ratingAndYearContainer}>
-                     <Text style={{ color: Colors.btnText }}>
-                        <Entypo name="star" size={14} color="yellow" />
-                        {Math.round(vote_average * 10) / 10}
-                     </Text>
-                     <Text style={{ color: Colors.btnText }}>
-                        {first_air_date?.split("-")[0]}
-                     </Text>
-                  </View>
-               </View>
+const SerieCard = ({
+  id,
+  poster_path,
+  name,
+  vote_average,
+  first_air_date,
+  onPress,
+}: Serie & { onPress?: () => void }) => {
+  const [loading, setLoading] = useState(true);
+  return (
+    <Link href={`../series/${id}`} asChild>
+      <TouchableOpacity onPress={onPress}>
+        <View style={styles.container}>
+          <View style={styles.posterWrapper}>
+            {(loading || !poster_path) && (
+              <Image
+                source={require("../assets/images/placeholder-portrait.png")}
+                style={styles.poster}
+                resizeMode="cover"
+              />
+            )}
+            {poster_path && (
+              <Image
+                source={{ uri: getPoster(poster_path) }}
+                style={styles.poster}
+                resizeMode="cover"
+                onLoadEnd={() => setLoading(false)}
+              />
+            )}
+          </View>
+
+          <View style={styles.movieContentContainer}>
+            <Text style={{ color: Colors.btnText }} numberOfLines={1}>
+              {name}
+            </Text>
+            <View style={styles.ratingAndYearContainer}>
+              <Text style={{ color: Colors.btnText }}>
+                <Entypo name="star" size={14} color="yellow" />
+                {Math.round(vote_average * 10) / 10}
+              </Text>
+              <Text style={{ color: Colors.btnText }}>
+                {first_air_date?.split("-")[0]}
+              </Text>
             </View>
-         </TouchableOpacity>
-      </Link>
-   );
+          </View>
+        </View>
+      </TouchableOpacity>
+    </Link>
+  );
 };
 
 export default memo(SerieCard);
 
 const styles = StyleSheet.create({
-   container: {
-      width: 100,
-      backgroundColor: Colors.card,
-      borderRadius: 10,
-      overflow: "hidden",
-   },
+  container: {
+    width: 100,
+    backgroundColor: Colors.card,
+    borderRadius: 10,
+    overflow: "hidden",
+  },
 
-   movieContentContainer: {
-      padding: 5,
-   },
+  posterWrapper: {
+    width: POSTER_WIDTH,
+    height: POSTER_HEIGHT,
+  },
 
-   ratingAndYearContainer: {
-      flexDirection: "row",
-      justifyContent: "space-between",
-      paddingVertical: 5,
-   },
+  poster: {
+    width: POSTER_WIDTH,
+    height: POSTER_HEIGHT,
+    position: "absolute",
+    top: 0,
+    left: 0,
+  },
+
+  movieContentContainer: {
+    padding: 5,
+  },
+
+  ratingAndYearContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    paddingVertical: 5,
+  },
 });
