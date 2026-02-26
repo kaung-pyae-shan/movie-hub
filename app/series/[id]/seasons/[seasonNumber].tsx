@@ -6,11 +6,11 @@ import { fetchSeasonDetails } from "@/services/serieService";
 import { getPoster } from "@/util/image";
 import { useLocalSearchParams } from "expo-router";
 import {
-    ActivityIndicator,
-    FlatList,
-    Image,
-    StyleSheet,
-    Text,
+  ActivityIndicator,
+  FlatList,
+  Image,
+  StyleSheet,
+  Text,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 

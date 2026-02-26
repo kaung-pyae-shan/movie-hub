@@ -12,11 +12,11 @@ import { Movie } from "@/types/movie";
 import { Person } from "@/types/person";
 import { Serie } from "@/types/serie";
 import {
-   ActivityIndicator,
-   ScrollView,
-   StyleSheet,
-   Text,
-   View,
+  ActivityIndicator,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 

@@ -4,9 +4,9 @@ import SeasonList from "@/components/SeasonList";
 import { Colors } from "@/constants/Colors";
 import useFetch from "@/hooks/useFetch";
 import {
-   fetchSerieCasts,
-   fetchSerieDetails,
-   fetchSerieVideos,
+  fetchSerieCasts,
+  fetchSerieDetails,
+  fetchSerieVideos,
 } from "@/services/serieService";
 import { getFavorites, toggleFavorite } from "@/storage/favoriteStorage";
 import { getPoster } from "@/util/image";
@@ -15,15 +15,15 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import { useLocalSearchParams } from "expo-router";
 import { useEffect, useMemo, useState } from "react";
 import {
-   ActivityIndicator,
-   Image,
-   Modal,
-   Pressable,
-   ScrollView,
-   StyleSheet,
-   Text,
-   TouchableOpacity,
-   View,
+  ActivityIndicator,
+  Image,
+  Modal,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import YoutubePlayer from "react-native-youtube-iframe";
@@ -77,7 +77,9 @@ export default function SerieDetails() {
     setIsFavourite(!!exists);
   };
 
-  const { data: castsAndCrews } = useFetch(() => fetchSerieCasts(id as string));
+  const { data: castsAndCrews, loading: castsLoading } = useFetch(() =>
+    fetchSerieCasts(id as string),
+  );
 
   // Get YouTube trailer only
   const trailerKey = useMemo(() => {
@@ -183,41 +185,49 @@ export default function SerieDetails() {
 
           <SeasonList seasons={serie.seasons} />
 
-          {castsAndCrews?.cast?.length ? (
-            <CastGrid title="Casts" casts={castsAndCrews.cast} />
+          {castsLoading ? (
+            <View style={styles.loaderContainer}>
+              <ActivityIndicator size="large" color="#fff" />
+            </View>
           ) : (
             <>
-              <Text
-                style={{
-                  color: Colors.text,
-                  fontSize: 18,
-                  fontWeight: "bold",
-                }}
-              >
-                Casts
-              </Text>
-              <Text style={{ color: Colors.text }}>
-                No casts information available.
-              </Text>
-            </>
-          )}
+              {castsAndCrews?.cast?.length ? (
+                <CastGrid title="Casts" casts={castsAndCrews.cast} />
+              ) : (
+                <>
+                  <Text
+                    style={{
+                      color: Colors.text,
+                      fontSize: 18,
+                      fontWeight: "bold",
+                    }}
+                  >
+                    Casts
+                  </Text>
+                  <Text style={{ color: Colors.text }}>
+                    No casts information available.
+                  </Text>
+                </>
+              )}
 
-          {castsAndCrews?.crew?.length ? (
-            <CastGrid title="Crews" casts={castsAndCrews.crew} />
-          ) : (
-            <>
-              <Text
-                style={{
-                  color: Colors.text,
-                  fontSize: 18,
-                  fontWeight: "bold",
-                }}
-              >
-                Crews
-              </Text>
-              <Text style={{ color: Colors.text }}>
-                No crews information available.
-              </Text>
+              {castsAndCrews?.crew?.length ? (
+                <CastGrid title="Crews" casts={castsAndCrews.crew} />
+              ) : (
+                <>
+                  <Text
+                    style={{
+                      color: Colors.text,
+                      fontSize: 18,
+                      fontWeight: "bold",
+                    }}
+                  >
+                    Crews
+                  </Text>
+                  <Text style={{ color: Colors.text }}>
+                    No crews information available.
+                  </Text>
+                </>
+              )}
             </>
           )}
         </View>

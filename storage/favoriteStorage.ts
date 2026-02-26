@@ -3,15 +3,18 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const STORAGE_KEY = "favorites";
 
+// Get favorites from local storage
 export const getFavorites = async (): Promise<FavoriteItem[]> => {
    const data = await AsyncStorage.getItem(STORAGE_KEY);
    return data ? JSON.parse(data) : [];
 };
 
+// Save favorites to local storage
 export const saveFavorites = async (items: FavoriteItem[]) => {
    await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(items));
 };
 
+// favorites toggler
 export const toggleFavorite = async (item: FavoriteItem) => {
    const favorites = await getFavorites();
 

@@ -5,187 +5,84 @@ import { MovieDetail } from "@/types/movieDetail";
 import { Trailer } from "@/types/trailer";
 import { TMDB_CONFIG } from "./config";
 
-type MovieResponse = {
+// ==============================
+// Types
+// ==============================
+
+export type MovieResponse = {
   page: number;
   results: Movie[];
   total_pages: number;
   total_results: number;
 };
 
-type ActorMovieResponse = {
+export type ActorMovieResponse = {
   cast: Movie[];
 };
 
-export const fetchTrendings = async (
-  page: number = 1,
-): Promise<MovieResponse> => {
-  const endpoint = `${TMDB_CONFIG.BASE_URL}/trending/all/day?page=${page}`;
+// ==============================
+// Core Fetch Helper (Reusable)
+// ==============================
 
-  const response = await fetch(endpoint, {
-    method: "GET",
-    headers: TMDB_CONFIG.headers,
-  });
+const fetchFromTMDB = async <T>(path: string): Promise<T> => {
+  const endpoint = `${TMDB_CONFIG.BASE_URL}${path}`;
 
-  if (!response.ok) {
-    throw new Error(`Failed to fetch movies: ${response.statusText}`);
+  try {
+    const response = await fetch(endpoint, {
+      method: "GET",
+      headers: TMDB_CONFIG.headers,
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(
+        `TMDB Error ${response.status}: ${response.statusText} - ${errorText}`,
+      );
+    }
+
+    return (await response.json()) as T;
+  } catch (error) {
+    console.error("TMDB Fetch Failed:", error);
+    throw error;
   }
-
-  const data: MovieResponse = await response.json();
-  return data;
 };
 
-export const fetchLatestMovies = async (
-  page: number = 1,
-): Promise<MovieResponse> => {
-  const endpoint = `${TMDB_CONFIG.BASE_URL}/discover/movie?vote_average.gte=1&vote_average.lte=9&primary_release_year=2026&page=${page}`;
-  //  const endpoint = `${TMDB_CONFIG.BASE_URL}/movie/now_playing?page=${page}`;
+// ==============================
+// Movie Endpoints
+// ==============================
 
-  const response = await fetch(endpoint, {
-    method: "GET",
-    headers: TMDB_CONFIG.headers,
-  });
+export const fetchTrendings = (page: number = 1) =>
+  fetchFromTMDB<MovieResponse>(`/trending/all/day?page=${page}`);
 
-  if (!response.ok) {
-    throw new Error(`Failed to fetch movies: ${response.statusText}`);
-  }
+export const fetchLatestMovies = (page: number = 1) =>
+  fetchFromTMDB<MovieResponse>(
+    `/discover/movie?vote_average.gte=1&vote_average.lte=9&primary_release_year=2026&page=${page}`,
+  );
 
-  const data: MovieResponse = await response.json();
-  return data;
-};
+export const fetchTopRatedMovies = (page: number = 1) =>
+  fetchFromTMDB<MovieResponse>(`/movie/top_rated?page=${page}`);
 
-export const fetchTopRatedMovies = async (
-  page: number = 1,
-): Promise<MovieResponse> => {
-  const endpoint = `${TMDB_CONFIG.BASE_URL}/movie/top_rated?page=${page}`;
+export const fetchPopularMovies = (page: number = 1) =>
+  fetchFromTMDB<MovieResponse>(`/movie/popular?page=${page}`);
 
-  const response = await fetch(endpoint, {
-    method: "GET",
-    headers: TMDB_CONFIG.headers,
-  });
+export const fetchMovieDetails = (movieId: string) =>
+  fetchFromTMDB<MovieDetail>(`/movie/${movieId}`);
 
-  if (!response.ok) {
-    throw new Error(`Failed to fetch movies: ${response.statusText}`);
-  }
+export const fetchMovieVideos = (movieId: string) =>
+  fetchFromTMDB<Trailer>(`/movie/${movieId}/videos`);
 
-  const data: MovieResponse = await response.json();
-  return data;
-};
-
-export const fetchPopularMovies = async (
-  page: number = 1,
-): Promise<MovieResponse> => {
-  const endpoint = `${TMDB_CONFIG.BASE_URL}/movie/popular?page=${page}`;
-
-  const response = await fetch(endpoint, {
-    method: "GET",
-    headers: TMDB_CONFIG.headers,
-  });
-
-  if (!response.ok) {
-    throw new Error(`Failed to fetch movies: ${response.statusText}`);
-  }
-
-  const data: MovieResponse = await response.json();
-  return data;
-};
-
-export const fetchMovieDetails = async (
-  movieId: string,
-): Promise<MovieDetail> => {
-  //  const endpoint = `${TMDB_CONFIG.BASE_URL}/discover/movie?sort_by=popularity.desc&page=${page}`;
-  const endpoint = `${TMDB_CONFIG.BASE_URL}/movie/${movieId}`;
-
-  const response = await fetch(endpoint, {
-    method: "GET",
-    headers: TMDB_CONFIG.headers,
-  });
-
-  if (!response.ok) {
-    throw new Error(`Failed to fetch movie details: ${response.statusText}`);
-  }
-
-  const data: MovieDetail = await response.json();
-  return data;
-};
-
-export const fetchMovieVideos = async (movieId: string): Promise<Trailer> => {
-  const endpoint = `${TMDB_CONFIG.BASE_URL}/movie/${movieId}/videos`;
-  const response = await fetch(endpoint, {
-    method: "GET",
-    headers: TMDB_CONFIG.headers,
-  });
-
-  if (!response.ok) {
-    throw new Error(`Failed to fetch movie videos: ${response.statusText}`);
-  }
-
-  const data: Trailer = await response.json();
-  return data;
-};
-
-export const fetchMoviesCasts = async (movieId: string): Promise<Credits> => {
-  const endpoint = `${TMDB_CONFIG.BASE_URL}/movie/${movieId}/credits`;
-  const response = await fetch(endpoint, {
-    method: "GET",
-    headers: TMDB_CONFIG.headers,
-  });
-
-  if (!response.ok) {
-    throw new Error(`Failed to fetch movie casts: ${response.statusText}`);
-  }
-
-  const data: Credits = await response.json();
-  return data;
-};
+export const fetchMoviesCasts = (movieId: string) =>
+  fetchFromTMDB<Credits>(`/movie/${movieId}/credits`);
 
 export const fetchMovieGenres = async (): Promise<Genre[]> => {
-  const endpoint = `${TMDB_CONFIG.BASE_URL}/genre/movie/list`;
-  const response = await fetch(endpoint, {
-    method: "GET",
-    headers: TMDB_CONFIG.headers,
-  });
-
-  if (!response.ok) {
-    throw new Error(`Failed to fetch movie genres: ${response.statusText}`);
-  }
-
-  const data: { genres: Genre[] } = await response.json();
+  const data = await fetchFromTMDB<{ genres: Genre[] }>(`/genre/movie/list`);
   return data.genres;
 };
 
-export const fetchMoviesByGenre = async (
-  genreId: number,
-  page: number = 1,
-): Promise<MovieResponse> => {
-  const endpoint = `${TMDB_CONFIG.BASE_URL}/discover/movie?with_genres=${genreId}&page=${page}`;
-  const response = await fetch(endpoint, {
-    method: "GET",
-    headers: TMDB_CONFIG.headers,
-  });
+export const fetchMoviesByGenre = (genreId: number, page: number = 1) =>
+  fetchFromTMDB<MovieResponse>(
+    `/discover/movie?with_genres=${genreId}&page=${page}`,
+  );
 
-  if (!response.ok) {
-    throw new Error(`Failed to fetch movies by genre: ${response.statusText}`);
-  }
-
-  const data: MovieResponse = await response.json();
-  return data;
-};
-
-export const fetchActorSpecificMovies = async (
-  personId: string,
-  page: number = 1,
-): Promise<ActorMovieResponse> => {
-  const endpoint = `${TMDB_CONFIG.BASE_URL}/person/${personId}/movie_credits?page=${page}`;
-
-  const response = await fetch(endpoint, {
-    method: "GET",
-    headers: TMDB_CONFIG.headers,
-  });
-
-  if (!response.ok) {
-    throw new Error(`Failed to fetch movies: ${response.statusText}`);
-  }
-
-  const data: ActorMovieResponse = await response.json();
-  return data;
-};
+export const fetchActorSpecificMovies = (personId: string) =>
+  fetchFromTMDB<ActorMovieResponse>(`/person/${personId}/movie_credits`);

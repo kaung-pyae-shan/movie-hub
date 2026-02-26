@@ -5,22 +5,22 @@ import SerieCard from "@/components/SerieCard";
 import { Colors } from "@/constants/Colors";
 import usePaginatedFetch from "@/hooks/usePaginatedFetch";
 import {
-   fetchLatestSeries,
-   fetchPopularSeries,
-   fetchSerieGenres,
-   fetchSeriesByGenre,
-   fetchTopRatedSeries,
+  fetchLatestSeries,
+  fetchPopularSeries,
+  fetchSerieGenres,
+  fetchSeriesByGenre,
+  fetchTopRatedSeries,
 } from "@/services/serieService";
 import { Genre } from "@/types/genre";
 import { Serie } from "@/types/serie";
 import { useEffect, useState } from "react";
 import {
-   ActivityIndicator,
-   FlatList,
-   ScrollView,
-   StyleSheet,
-   Text,
-   View,
+  ActivityIndicator,
+  FlatList,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 

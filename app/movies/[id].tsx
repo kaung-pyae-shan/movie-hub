@@ -3,9 +3,9 @@ import { FloatingBack } from "@/components/FloatingBack";
 import { Colors } from "@/constants/Colors";
 import useFetch from "@/hooks/useFetch";
 import {
-   fetchMovieDetails,
-   fetchMoviesCasts,
-   fetchMovieVideos,
+  fetchMovieDetails,
+  fetchMoviesCasts,
+  fetchMovieVideos,
 } from "@/services/movieService";
 import { getFavorites, toggleFavorite } from "@/storage/favoriteStorage";
 import { getPoster } from "@/util/image";
@@ -14,15 +14,15 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import { useLocalSearchParams } from "expo-router";
 import { useEffect, useMemo, useState } from "react";
 import {
-   ActivityIndicator,
-   Image,
-   Modal,
-   Pressable,
-   ScrollView,
-   StyleSheet,
-   Text,
-   TouchableOpacity,
-   View,
+  ActivityIndicator,
+  Image,
+  Modal,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import YoutubePlayer from "react-native-youtube-iframe";
@@ -76,7 +76,7 @@ export default function MovieDetails() {
     setIsFavourite(!!exists);
   };
 
-  const { data: castsAndCrews } = useFetch(() =>
+  const { data: castsAndCrews, loading: castsLoading } = useFetch(() =>
     fetchMoviesCasts(id as string),
   );
 
@@ -183,20 +183,50 @@ export default function MovieDetails() {
           <Text style={styles.text}>{movie.overview}</Text>
         </View>
 
-        {castsAndCrews?.cast?.length ? (
-          <CastGrid title="Casts" casts={castsAndCrews.cast} />
+        {castsLoading ? (
+          <View style={styles.loaderContainer}>
+            <ActivityIndicator size="large" color="#fff" />
+          </View>
         ) : (
-          <Text style={{ color: Colors.text }}>
-            No casts information available.
-          </Text>
-        )}
+          <>
+            {castsAndCrews?.cast?.length ? (
+              <CastGrid title="Casts" casts={castsAndCrews.cast} />
+            ) : (
+              <>
+                <Text
+                  style={{
+                    color: Colors.text,
+                    fontSize: 18,
+                    fontWeight: "bold",
+                  }}
+                >
+                  Casts
+                </Text>
+                <Text style={{ color: Colors.text }}>
+                  No casts information available.
+                </Text>
+              </>
+            )}
 
-        {castsAndCrews?.crew?.length ? (
-          <CastGrid title="Crews" casts={castsAndCrews.crew} />
-        ) : (
-          <Text style={{ color: Colors.text }}>
-            No crews information available.
-          </Text>
+            {castsAndCrews?.crew?.length ? (
+              <CastGrid title="Crews" casts={castsAndCrews.crew} />
+            ) : (
+              <>
+                <Text
+                  style={{
+                    color: Colors.text,
+                    fontSize: 18,
+                    fontWeight: "bold",
+                  }}
+                >
+                  Crews
+                </Text>
+                <Text style={{ color: Colors.text }}>
+                  No crews information available.
+                </Text>
+              </>
+            )}
+          </>
         )}
       </ScrollView>
 
