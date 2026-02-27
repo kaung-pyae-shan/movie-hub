@@ -53,7 +53,7 @@ const FavoriteScreen = () => {
     }, [selectedTab]),
   );
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView edges={["top"]} style={styles.container}>
       <Header />
       <View style={styles.toggleContainer}>
         <TouchableOpacity
@@ -85,36 +85,38 @@ const FavoriteScreen = () => {
         </TouchableOpacity>
       </View>
 
-      {loading ? (
-        <ActivityIndicator size="large" />
-      ) : (
-        <FlatList
-          data={formatData(data, 3)}
-          keyExtractor={(item) => item.id.toString()}
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={{
-            paddingHorizontal: 5,
-            paddingTop: 8,
-          }}
-          columnWrapperStyle={{
-            justifyContent: "space-between",
-            marginBottom: 12,
-          }}
-          numColumns={3}
-          ListEmptyComponent={!loading ? <EmptyFavorites /> : null}
-          renderItem={({ item }) => {
-            if (item.empty) {
-              return <View style={{ width: 100, marginBottom: 12 }} />;
-            }
+      <View style={styles.listContainer}>
+        {loading ? (
+          <ActivityIndicator size="large" />
+        ) : (
+          <FlatList
+            data={formatData(data, 3)}
+            keyExtractor={(item) => item.id.toString()}
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={{
+              paddingHorizontal: 5,
+              paddingTop: 8,
+            }}
+            columnWrapperStyle={{
+              justifyContent: "space-between",
+              marginBottom: 12,
+            }}
+            numColumns={3}
+            ListEmptyComponent={!loading ? <EmptyFavorites /> : null}
+            renderItem={({ item }) => {
+              if (item.empty) {
+                return <View style={{ width: 100, marginBottom: 12 }} />;
+              }
 
-            return selectedTab === "movie" ? (
-              <MovieCard {...item} />
-            ) : (
-              <SerieCard {...item} />
-            );
-          }}
-        />
-      )}
+              return selectedTab === "movie" ? (
+                <MovieCard {...item} />
+              ) : (
+                <SerieCard {...item} />
+              );
+            }}
+          />
+        )}
+      </View>
     </SafeAreaView>
   );
 };
@@ -142,9 +144,10 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.background,
     paddingHorizontal: 20,
   },
+  listContainer: {
+    flex: 1,
+  },
   toggleContainer: {
-    width: "90%",
-    alignSelf: "center",
     flexDirection: "row",
     backgroundColor: "#1A1A1A",
     borderRadius: 12,

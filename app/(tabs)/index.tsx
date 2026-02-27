@@ -7,7 +7,7 @@ import { Colors } from "@/constants/Colors";
 import usePaginatedFetch from "@/hooks/usePaginatedFetch";
 import { fetchPopularActors } from "@/services/actorService";
 import { fetchLatestMovies, fetchTrendings } from "@/services/movieService";
-import { fetchLatestSeries } from "@/services/serieService";
+import { fetchOngoingSeries } from "@/services/serieService";
 import { Movie } from "@/types/movie";
 import { Person } from "@/types/person";
 import { Serie } from "@/types/serie";
@@ -36,11 +36,11 @@ export default function Index() {
   } = usePaginatedFetch(fetchLatestMovies);
 
   const {
-    data: latestSeries,
-    loading: latestSeriesLoading,
-    error: latestSeriesError,
-    loadMore: loadMoreLatestSeries,
-  } = usePaginatedFetch(fetchLatestSeries);
+    data: ongoingSeries,
+    loading: ongoingSeriesLoading,
+    error: ongoingSeriesError,
+    loadMore: loadMoreOngoingSeries,
+  } = usePaginatedFetch(fetchOngoingSeries);
 
   const {
     data: popularActors,
@@ -55,9 +55,9 @@ export default function Index() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ minHeight: "100%", paddingBottom: 10 }}
       >
-        {latestMoviesLoading && trendingsLoading && latestSeriesLoading ? (
+        {latestMoviesLoading && trendingsLoading && ongoingSeriesLoading ? (
           <ActivityIndicator size="large" color={Colors.card} />
-        ) : trendingsError || latestMoviesError || latestSeriesError ? (
+        ) : trendingsError || latestMoviesError || ongoingSeriesError ? (
           <Text>Error: {trendingsError?.message}</Text>
         ) : (
           <View>
@@ -86,10 +86,10 @@ export default function Index() {
             />
 
             <HorizontalList<Serie>
-              title="Latest Series"
-              data={latestSeries}
-              loadMore={loadMoreLatestSeries}
-              loading={latestSeriesLoading}
+              title="Ongoing Series"
+              data={ongoingSeries}
+              loadMore={loadMoreOngoingSeries}
+              loading={ongoingSeriesLoading}
               keyExtractor={(item) => item.id.toString()}
               renderItem={({ item }) => <SerieCard {...item} />}
             />
@@ -111,7 +111,6 @@ export default function Index() {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     backgroundColor: Colors.background,
     paddingHorizontal: 20,
   },

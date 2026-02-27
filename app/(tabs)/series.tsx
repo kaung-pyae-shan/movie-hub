@@ -5,7 +5,7 @@ import SerieCard from "@/components/SerieCard";
 import { Colors } from "@/constants/Colors";
 import usePaginatedFetch from "@/hooks/usePaginatedFetch";
 import {
-  fetchLatestSeries,
+  fetchOngoingSeries,
   fetchPopularSeries,
   fetchSerieGenres,
   fetchSeriesByGenre,
@@ -45,11 +45,11 @@ export default function SeriesScreen() {
   );
 
   const {
-    data: latestSeries,
-    loading: latestSeriesLoading,
-    error: latestSeriesError,
-    loadMore: loadMoreLatestSeries,
-  } = usePaginatedFetch(fetchLatestSeries);
+    data: ongoingSeries,
+    loading: ongoingSeriesLoading,
+    error: ongoingSeriesError,
+    loadMore: loadMoreOngoingSeries,
+  } = usePaginatedFetch(fetchOngoingSeries);
 
   const {
     data: topRatedSeries,
@@ -66,10 +66,10 @@ export default function SeriesScreen() {
   } = usePaginatedFetch(fetchPopularSeries);
 
   const isInitialLoading =
-    latestSeriesLoading &&
+    ongoingSeriesLoading &&
     topRatedSeriesLoading &&
     popularSeriesLoading &&
-    latestSeries.length === 0 &&
+    ongoingSeries.length === 0 &&
     topRatedSeries.length === 0 &&
     popularSeries.length === 0;
 
@@ -110,15 +110,15 @@ export default function SeriesScreen() {
         >
           {isInitialLoading ? (
             <ActivityIndicator size="large" color={Colors.card} />
-          ) : latestSeriesError || topRatedSeriesError || popularSeriesError ? (
+          ) : ongoingSeriesError || topRatedSeriesError || popularSeriesError ? (
             <Text>Error: {popularSeriesError?.message}</Text>
           ) : (
             <View>
               <HorizontalList<Serie>
-                title="Latest Series"
-                data={latestSeries}
-                loadMore={loadMoreLatestSeries}
-                loading={latestSeriesLoading}
+                title="Ongoing Series"
+                data={ongoingSeries}
+                loadMore={loadMoreOngoingSeries}
+                loading={ongoingSeriesLoading}
                 keyExtractor={(item) => item.id.toString()}
                 renderItem={({ item }) => <SerieCard {...item} />}
               />
@@ -150,7 +150,6 @@ export default function SeriesScreen() {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     backgroundColor: Colors.background,
     paddingHorizontal: 20,
   },

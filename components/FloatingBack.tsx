@@ -5,7 +5,7 @@ import { Pressable, StyleSheet } from "react-native";
 export function FloatingBack() {
   return (
     <Pressable onPress={() => router.back()} style={styles.backButton}>
-      <Entypo name="cross" size={24} color="white" />
+      <Entypo name="chevron-thin-left" size={24} color="white" />
     </Pressable>
   );
 }
@@ -13,8 +13,8 @@ export function FloatingBack() {
 const styles = StyleSheet.create({
   backButton: {
     position: "absolute",
-    top: 60,
-    right: 22,
+    top: 65,
+    left: 22,
     zIndex: 100,
     width: 40,
     height: 40,

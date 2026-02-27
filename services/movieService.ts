@@ -54,10 +54,12 @@ const fetchFromTMDB = async <T>(path: string): Promise<T> => {
 export const fetchTrendings = (page: number = 1) =>
   fetchFromTMDB<MovieResponse>(`/trending/all/day?page=${page}`);
 
-export const fetchLatestMovies = (page: number = 1) =>
-  fetchFromTMDB<MovieResponse>(
-    `/discover/movie?vote_average.gte=1&vote_average.lte=9&primary_release_year=2026&page=${page}`,
+export const fetchLatestMovies = (page: number = 1) => {
+  const today = new Date().toISOString().split("T")[0];
+  return fetchFromTMDB<MovieResponse>(
+    `/discover/movie?sort_by=release_date.desc&sort_by=vote_average&vote_average.lte=9.5&release_date.lte=${today}&page=${page}`,
   );
+};
 
 export const fetchTopRatedMovies = (page: number = 1) =>
   fetchFromTMDB<MovieResponse>(`/movie/top_rated?page=${page}`);

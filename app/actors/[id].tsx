@@ -25,8 +25,6 @@ const ActorDetails = () => {
   const [expanded, setExpanded] = useState(false);
   const { id } = useLocalSearchParams();
 
-  // if (!id) return <Text>Invalid actor ID</Text>;
-
   const { data: actor, loading } = useFetch(() =>
     fetchActorDetails(id as string),
   );

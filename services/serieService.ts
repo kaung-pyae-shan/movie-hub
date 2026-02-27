@@ -1,10 +1,10 @@
 import { Credits } from "@/types/credits";
 import { Genre } from "@/types/genre";
+import { Season } from "@/types/season";
 import { Serie } from "@/types/serie";
 import { SerieDetail } from "@/types/serieDetail";
 import { Trailer } from "@/types/trailer";
 import { TMDB_CONFIG } from "./config";
-import { Season } from "@/types/season";
 
 // ==============================
 // Types
@@ -52,7 +52,7 @@ const fetchFromTMDB = async <T>(path: string): Promise<T> => {
 // TV Series Endpoints
 // ==============================
 
-export const fetchLatestSeries = (page: number = 1) =>
+export const fetchOngoingSeries = (page: number = 1) =>
   fetchFromTMDB<SerieResponse>(`/tv/on_the_air?page=${page}`);
 
 export const fetchTopRatedSeries = (page: number = 1) =>
