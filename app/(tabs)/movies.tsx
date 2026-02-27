@@ -74,7 +74,7 @@ export default function MoviesScreen() {
     popularMovies.length === 0;
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView edges={["top"]} style={styles.container}>
       <Header />
       <GenreDropdown
         title={"Movies Genres"}
@@ -113,7 +113,7 @@ export default function MoviesScreen() {
           ) : latestMoviesError || topRatedMoviesError || popularMoviesError ? (
             <Text>Error: {popularMoviesError?.message}</Text>
           ) : (
-            <View>
+            <View style={{ flex: 1 }}>
               <HorizontalList<Movie>
                 title="Latest Movies"
                 data={latestMovies}
@@ -150,6 +150,7 @@ export default function MoviesScreen() {
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1,
     backgroundColor: Colors.background,
     paddingHorizontal: 20,
   },

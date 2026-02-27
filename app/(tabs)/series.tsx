@@ -74,7 +74,7 @@ export default function SeriesScreen() {
     popularSeries.length === 0;
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView edges={["top"]} style={styles.container}>
       <Header />
       <GenreDropdown
         title={"Series Genres"}
@@ -110,10 +110,12 @@ export default function SeriesScreen() {
         >
           {isInitialLoading ? (
             <ActivityIndicator size="large" color={Colors.card} />
-          ) : ongoingSeriesError || topRatedSeriesError || popularSeriesError ? (
+          ) : ongoingSeriesError ||
+            topRatedSeriesError ||
+            popularSeriesError ? (
             <Text>Error: {popularSeriesError?.message}</Text>
           ) : (
-            <View>
+            <View style={styles.listContainer}>
               <HorizontalList<Serie>
                 title="Ongoing Series"
                 data={ongoingSeries}
@@ -150,7 +152,11 @@ export default function SeriesScreen() {
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1,
     backgroundColor: Colors.background,
     paddingHorizontal: 20,
+  },
+  listContainer: {
+    flex: 1,
   },
 });

@@ -11,6 +11,7 @@ import { fetchOngoingSeries } from "@/services/serieService";
 import { Movie } from "@/types/movie";
 import { Person } from "@/types/person";
 import { Serie } from "@/types/serie";
+import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import {
   ActivityIndicator,
   ScrollView,
@@ -48,12 +49,14 @@ export default function Index() {
     loadMore: loadMorePopularActors,
   } = usePaginatedFetch(fetchPopularActors);
 
+  const tabBarHeight = useBottomTabBarHeight();
+
   return (
     <SafeAreaView style={styles.container}>
       <Header />
       <ScrollView
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ minHeight: "100%", paddingBottom: 10 }}
+        contentContainerStyle={{ paddingBottom: tabBarHeight - 10 }}
       >
         {latestMoviesLoading && trendingsLoading && ongoingSeriesLoading ? (
           <ActivityIndicator size="large" color={Colors.card} />
